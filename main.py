@@ -36,6 +36,7 @@ class Ship:
     def draw(self, window):
         window.blit(self.rotatedSurf, self.rotatedRect)
 
+
     def turn_left(self):
         self.angle += 5
         self.rotatedSurf = p.transform.rotate(self.ship_img, self.angle)
@@ -44,6 +45,7 @@ class Ship:
         self.cosine  = math.cos(math.radians(self.angle + 90))
         self.sine = math.sin(math.radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
+
 
     def turn_right(self):
         self.angle -= 5
@@ -54,6 +56,7 @@ class Ship:
         self.sine = math.sin(math.radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
     
+
     def move_forward(self):
         self.x += self.cosine * 6
         self.y -= self.sine * 6
@@ -76,6 +79,7 @@ def main():
 
     clock = p.time.Clock()
 
+
     def redraw_display():
         DIS.blit(BG, (0, 0))
         
@@ -89,6 +93,7 @@ def main():
         player.draw(DIS)
 
         p.display.update()
+
 
     while running:
         clock.tick(FPS)
