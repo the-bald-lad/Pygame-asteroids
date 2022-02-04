@@ -1,4 +1,4 @@
-import pygame as p, os, time, random as r, math
+import pygame as p, os, math
 p.font.init()
 
 WIDTH, HEIGHT = 1000, 1000
