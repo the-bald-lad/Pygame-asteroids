@@ -9,7 +9,7 @@ p.display.set_caption("Big Rocks in Space")
 black = (0, 0, 0)
 white = (255, 255, 255)
 
-ASTEROID = p.image.load(os.path.join("assets", "asteroid.png"))
+ASTEROID = p.transform.scale(p.image.load(os.path.join("assets", "asteroid.png")), (60, 60))
 SHIP = p.transform.scale(p.image.load(os.path.join("assets", "ship.png")), (SHIP_SIZE_X, SHIP_SIZE_Y))
 
 BG = p.transform.scale(p.image.load(os.path.join("assets", "background-space.jpg")), (WIDTH, HEIGHT))
@@ -74,25 +74,47 @@ class Ship:
         self.x = randint(0, HEIGHT-self.ship_img.get_width())
     
     def check(self):
-        if self.x - self.ship_img.get_width() > WIDTH:
+        if self.x > WIDTH:
             self.x = 0
         if self.x < 0:
             self.x = WIDTH
-        if self.y - self.ship_img.get_height() > WIDTH:
+        if self.y > WIDTH:
             self.y = 0
         if self.y < 0:
             self.y = HEIGHT
 
+
+class Asteroid:
+    def __init__(self,x, y, health=100):
+        self.x = x
+        self.y = y
+        self.w = ASTEROID.get_width()
+        self.h = ASTEROID.get_height()
+        
+        self.health = health
+        self.ast_img = ASTEROID
+    
+    def move_to_player(self):
+        if self.x < WIDTH/2:
+            self.x += 1
+            self.y += 1
+        else:
+            self.x -= 1
+            self.y += 1
+
+    def draw(self, window):
+        if not self.x > WIDTH or not self.y > HEIGHT or not self.x < 0 or not self.y < 0:
+            window.blit(self.ast_img, (self.x, self.y))
 
 def main():
     running = True
     FPS = 60
     level, lives = 1, 5
     m_font = p.font.SysFont("opensans", 50)
-    player_vel = 0
     hyper_cooldown = 0
 
     player = Ship(WIDTH/2 - 30, HEIGHT/2)
+    ast = Asteroid(randint(0, WIDTH), randint(-10, 0))
 
     clock = p.time.Clock()
 
@@ -110,6 +132,7 @@ def main():
         DIS.blit(hyper_label, (WIDTH/2 - hyper_label.get_width()/2, 10))
 
         player.draw(DIS)
+        ast.draw(DIS)
 
         p.display.update()
 
@@ -133,7 +156,9 @@ def main():
         if keys[p.K_SPACE] and hyper_cooldown <= 0: # hyperspace
             player.hyper_space()
             player.move_forward()
-            hyper_cooldown = 60*5
+            hyper_cooldown = FPS*5
+
+        ast.move_to_player()
 
         player.check()
         
