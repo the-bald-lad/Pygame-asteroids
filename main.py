@@ -1,3 +1,4 @@
+from gevent import with_timeout
 import pygame as p, os, math 
 from random import randint
 p.font.init() # inialises pygame fonts
@@ -6,15 +7,14 @@ WIDTH, HEIGHT = 750, 750 # This will change depending on which machine it was be
 SHIP_SIZE_X, SHIP_SIZE_Y = 50, 50
 DIS = p.display.set_mode((WIDTH, HEIGHT))
 p.display.set_caption("Big Rocks in Space") # Sets the title of the window
-black = (0, 0, 0) # These are just so i can be lazy and don't have to type out the 3 numbers every time
-white = (255, 255, 255)
+WHITE = (255, 255, 255) # This is just so i can be lazy and don't have to type out the 3 numbers every time
 
-# loading images 
+# Loading images 
 ASTEROID = p.transform.scale(p.image.load(os.path.join("assets", "asteroid.png")), (60, 60)) 
 SHIP = p.transform.scale(p.image.load(os.path.join("assets", "ship.png")), (SHIP_SIZE_X, SHIP_SIZE_Y))
 BG = p.transform.scale(p.image.load(os.path.join("assets", "background-space.jpg")), (WIDTH, HEIGHT))
 
-# classes for objects on the window
+# Classes for objects on the window
 class Ship:
     def __init__(self, x, y, health=100):
         self.x = x
@@ -151,9 +151,9 @@ def main():
         DIS.blit(BG, (0, 0))
         
         # text
-        lives_label = m_font.render(f"Lives: {lives}", 1, white)
-        level_label = m_font.render(f"Level: {level}", 1, white)
-        hyper_label = m_font.render(f"Hyperspace cooldown: {round(hyper_cooldown/60)}", 1, white)
+        lives_label = m_font.render(f"Lives: {lives}", 1, WHITE)
+        level_label = m_font.render(f"Level: {level}", 1, WHITE)
+        hyper_label = m_font.render(f"Hyperspace cooldown: {round(hyper_cooldown/60)}", 1, WHITE)
 
         player.draw(DIS)
         
