@@ -133,7 +133,7 @@ def main():
     player = Ship(WIDTH/2 - 30, HEIGHT/2)
     asts = []
     
-    for i in range(1, 5, round(WIDTH/10)):
+    for i in range(1, 5, round(WIDTH/10)): 
         asts.append(Asteroid(randint(i, WIDTH), randint(-10, 0)))
 
     clock = p.time.Clock()
@@ -152,6 +152,7 @@ def main():
         DIS.blit(hyper_label, (WIDTH/2 - hyper_label.get_width()/2, 10))
 
         player.draw(DIS)
+        
         for i in asts:
             i.draw(DIS)
 
@@ -163,6 +164,7 @@ def main():
         hyper_cooldown -= 1 
         if hyper_cooldown < 0: hyper_cooldown = 0
 
+        # event loop
         for event in p.event.get():
             if event.type == p.QUIT:
                 running = False
