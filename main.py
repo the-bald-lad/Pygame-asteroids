@@ -131,7 +131,10 @@ def main():
     hyper_cooldown = 0
 
     player = Ship(WIDTH/2 - 30, HEIGHT/2)
-    ast = Asteroid(randint(0, WIDTH), randint(-10, 0))
+    asts = []
+    
+    for i in range(1, 5, round(WIDTH/10)):
+        asts.append(Asteroid(randint(i, WIDTH), randint(-10, 0)))
 
     clock = p.time.Clock()
 
@@ -149,7 +152,8 @@ def main():
         DIS.blit(hyper_label, (WIDTH/2 - hyper_label.get_width()/2, 10))
 
         player.draw(DIS)
-        ast.draw(DIS)
+        for i in asts:
+            i.draw(DIS)
 
         p.display.update()
 
@@ -175,10 +179,13 @@ def main():
             player.move_forward()
             hyper_cooldown = FPS*5
 
-        ast.move()
+        for i in asts:
+            i.move()
 
         player.check()
-        ast.check()
+        
+        for i in asts:
+            i.check()
         
         redraw_display()
 
