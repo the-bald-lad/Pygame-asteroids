@@ -13,6 +13,7 @@ WHITE = (255, 255, 255) # This is just so i can be lazy and don't have to type o
 ASTEROID = p.transform.scale(p.image.load(os.path.join("assets", "asteroid.png")), (60, 60)) 
 SHIP = p.transform.scale(p.image.load(os.path.join("assets", "ship.png")), (SHIP_SIZE_X, SHIP_SIZE_Y))
 BG = p.transform.scale(p.image.load(os.path.join("assets", "background-space.jpg")), (WIDTH, HEIGHT))
+LASER = p.transform.scale(p.image.load(os.path.join("assets", "laser.png")), (30, 30)) 
 
 # Classes for objects on the window
 class Ship:
@@ -21,10 +22,10 @@ class Ship:
         self.y = y
         self.w = SHIP.get_width()
         self.h = SHIP.get_height()
-
-        self.move = 0
-        self.health = health
         self.ship_img = SHIP
+        self.laser_img = LASER
+        self.mask = p.mask.from_surface(self.ship_img)
+        self.health = health
 
         self.angle = 0
         self.rotatedSurf = p.transform.rotate(self.ship_img, self.angle)
@@ -33,6 +34,14 @@ class Ship:
         self.cosine  = math.cos(math.radians(self.angle + 90))
         self.sine = math.sin(math.radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
+        
+        self.angle2 = 0
+        self.rotatedSurf2 = p.transform.rotate(self.ship_img, self.angle)
+        self.rotatedRect2 = self.rotatedSurf.get_rect()
+        self.rotatedRect2.center = (self.x, self.y)
+        self.cosine2  = math.cos(math.radians(self.angle + 90))
+        self.sine2 = math.sin(math.radians(self.angle + 90))
+        self.head2 = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
 
     def draw(self, window):
         window.blit(self.rotatedSurf, self.rotatedRect)
@@ -45,6 +54,14 @@ class Ship:
         self.cosine  = math.cos(math.radians(self.angle + 90))
         self.sine = math.sin(math.radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
+        
+        self.angle2 += 5
+        self.rotatedSurf2 = p.transform.rotate(self.laser_img, self.angle)
+        self.rotatedRect2 = self.rotatedSurf.get_rect()
+        self.rotatedRect2.center = (self.x, self.y)
+        self.cosine2  = math.cos(math.radians(self.angle + 90))
+        self.sine2 = math.sin(math.radians(self.angle + 90))
+        self.head2 = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
 
     def turn_right(self):
         self.angle -= 5
@@ -54,6 +71,14 @@ class Ship:
         self.cosine  = math.cos(math.radians(self.angle + 90))
         self.sine = math.sin(math.radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
+        
+        self.angle2 -= 5
+        self.rotatedSurf2 = p.transform.rotate(self.laser_img, self.angle)
+        self.rotatedRect2 = self.rotatedSurf.get_rect()
+        self.rotatedRect2.center = (self.x, self.y)
+        self.cosine2  = math.cos(math.radians(self.angle + 90))
+        self.sine2 = math.sin(math.radians(self.angle + 90))
+        self.head2 = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
     
     def move_forward(self):
         self.x += self.cosine * 6
@@ -68,6 +93,9 @@ class Ship:
     def hyper_space(self):
         self.x = randint(0, WIDTH-self.ship_img.get_width())
         self.x = randint(0, HEIGHT-self.ship_img.get_width())
+        
+    def shoot(self, window):
+        window.blit(self.rotatedSurf2, self.rotatedRect2)
     
     def check(self):
         if self.x > WIDTH:
@@ -135,14 +163,6 @@ def main():
 
     player = Ship(WIDTH/2 - 30, HEIGHT/2)
     asts = []
-    
-    # adds meteors to the top of the window
-    for i in range(3): 
-        asts.append(Asteroid(randint(0, WIDTH), randint(-10, 0)))
-
-    # adds meteors to the bottom of the window
-    for i in range(3): 
-        asts.append(Asteroid(randint(0, WIDTH), randint(HEIGHT, HEIGHT+10)))
 
     clock = p.time.Clock()
 
@@ -163,14 +183,28 @@ def main():
         DIS.blit(lives_label, (10, 10))
         DIS.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
         DIS.blit(hyper_label, (WIDTH/2 - hyper_label.get_width()/2, 10))
-
+        
         p.display.update()
+
+    def draw_asts():
+        # adds meteors to the top of the window
+        for i in range(level*2): 
+            asts.append(Asteroid(randint(0, WIDTH), randint(-10, 0)))
+
+        # adds meteors to the bottom of the window
+        for i in range(level*2): 
+            asts.append(Asteroid(randint(0, WIDTH), randint(HEIGHT, HEIGHT+10)))
 
     # main loop
     while running:
         clock.tick(FPS)
         hyper_cooldown -= 1 
-        if hyper_cooldown < 0: hyper_cooldown = 0
+        if hyper_cooldown < 0: 
+            hyper_cooldown = 0
+        
+        if len(asts) == 0:
+            level += 1
+            draw_asts()
 
         # event loop
         for event in p.event.get():
@@ -185,6 +219,8 @@ def main():
             player.turn_right()
         if keys[p.K_w]: # up
             player.move_forward()
+        if keys[p.K_c]: # c to shoot
+            player.shoot(DIS)
         if keys[p.K_SPACE] and hyper_cooldown <= 0: # hyperspace
             player.hyper_space()
             player.move_forward() # This is needed to make the ship update on the screen
