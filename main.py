@@ -132,7 +132,7 @@ class Asteroid:
 
 # main function
 def main():
-    running = True
+    running = True # makes the game loop start
     FPS = 60
     level, lives = 1, 5
     m_font = p.font.SysFont("opensans", 50)
@@ -141,15 +141,17 @@ def main():
     player = Ship(WIDTH/2 - 30, HEIGHT/2)
     asts = []
     
+    # adds meteors to the top of the window
     for i in range(3): 
         asts.append(Asteroid(randint(0, WIDTH), randint(-10, 0)))
-    
+
+    # adds meteors to the bottom of the window
     for i in range(3): 
         asts.append(Asteroid(randint(0, WIDTH), randint(HEIGHT, HEIGHT+10)))
 
     clock = p.time.Clock()
 
-    
+    #function to redraw the window
     def redraw_display():
         DIS.blit(BG, (0, 0))
         
