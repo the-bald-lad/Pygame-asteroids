@@ -1,20 +1,21 @@
 import pygame as p, os, math 
 from random import randint
-p.font.init()
+p.font.init() # inialises pygame fonts
 
-WIDTH, HEIGHT = 750, 750
+WIDTH, HEIGHT = 750, 750 # This will change depending on where it was being programmed
 SHIP_SIZE_X, SHIP_SIZE_Y = 50, 50
 DIS = p.display.set_mode((WIDTH, HEIGHT))
-p.display.set_caption("Big Rocks in Space")
-black = (0, 0, 0)
+p.display.set_caption("Big Rocks in Space") # Sets the title of the window
+black = (0, 0, 0) # These are just so i can be lazy and don't have to type out the 3 numbers every time
 white = (255, 255, 255)
 
-ASTEROID = p.transform.scale(p.image.load(os.path.join("assets", "asteroid.png")), (60, 60))
+# loading images 
+ASTEROID = p.transform.scale(p.image.load(os.path.join("assets", "asteroid.png")), (60, 60)) 
 SHIP = p.transform.scale(p.image.load(os.path.join("assets", "ship.png")), (SHIP_SIZE_X, SHIP_SIZE_Y))
 
 BG = p.transform.scale(p.image.load(os.path.join("assets", "background-space.jpg")), (WIDTH, HEIGHT))
 
-
+# classes for objects on the window
 class Ship:
     def __init__(self, x, y, health=100):
         self.x = x
@@ -88,8 +89,8 @@ class Asteroid:
     def __init__(self,x, y, health=100):
         self.x = x
         self.y = y
-        self.sx = x
-        self.sy = y
+        self.sx = x # needed for original x value for reset
+        self.sy = y # needed for original x value for reset
         self.w = ASTEROID.get_width()
         self.h = ASTEROID.get_height()
         
@@ -121,6 +122,7 @@ class Asteroid:
     def draw(self, window):
         window.blit(self.ast_img, (self.x, self.y))
 
+# main function
 def main():
     running = True
     FPS = 60
@@ -133,7 +135,7 @@ def main():
 
     clock = p.time.Clock()
 
-
+    
     def redraw_display():
         DIS.blit(BG, (0, 0))
         
