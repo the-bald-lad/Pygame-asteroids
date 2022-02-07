@@ -2,7 +2,7 @@ import pygame as p, os, math
 from random import randint
 p.font.init()
 
-WIDTH, HEIGHT = 1000, 1000
+WIDTH, HEIGHT = 750, 750
 SHIP_SIZE_X, SHIP_SIZE_Y = 50, 50
 DIS = p.display.set_mode((WIDTH, HEIGHT))
 p.display.set_caption("Big Rocks in Space")
@@ -88,23 +88,38 @@ class Asteroid:
     def __init__(self,x, y, health=100):
         self.x = x
         self.y = y
+        self.sx = x
+        self.sy = y
         self.w = ASTEROID.get_width()
         self.h = ASTEROID.get_height()
         
         self.health = health
         self.ast_img = ASTEROID
     
-    def move_to_player(self):
-        if self.x < WIDTH/2:
+    def move(self):
+        if self.sx < WIDTH/2:
             self.x += 1
             self.y += 1
         else:
             self.x -= 1
             self.y += 1
+    
+    def check(self):
+        if self.x > WIDTH:
+            self.x = self.sx
+            self.y = self.sy
+        if self.x < 0:
+            self.x = self.sx
+            self.y = self.sy
+        if self.y > WIDTH:
+            self.x = self.sx
+            self.y = self.sy
+        if self.y < 0:
+            self.x = self.sx
+            self.y = self.sy
 
     def draw(self, window):
-        if not self.x > WIDTH or not self.y > HEIGHT or not self.x < 0 or not self.y < 0:
-            window.blit(self.ast_img, (self.x, self.y))
+        window.blit(self.ast_img, (self.x, self.y))
 
 def main():
     running = True
@@ -158,9 +173,10 @@ def main():
             player.move_forward()
             hyper_cooldown = FPS*5
 
-        ast.move_to_player()
+        ast.move()
 
         player.check()
+        ast.check()
         
         redraw_display()
 
