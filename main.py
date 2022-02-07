@@ -99,23 +99,31 @@ class Asteroid:
     
     def move(self):
         if self.sx < WIDTH/2:
-            self.x += 1
-            self.y += 1
+            if self.sy > HEIGHT/2:
+                self.x += 1
+                self.y -= 1
+            else:
+                self.x += 1
+                self.y += 1
         else:
-            self.x -= 1
-            self.y += 1
+            if self.sy > HEIGHT/2:
+                self.x -= 1
+                self.y -=1
+            else:
+                self.x -= 1
+                self.y += 1
     
     def check(self):
-        if self.x > WIDTH+10:
+        if self.x > WIDTH+15:
             self.x = self.sx
             self.y = self.sy
-        if self.x < -10:
+        if self.x < -15:
             self.x = self.sx
             self.y = self.sy
-        if self.y > WIDTH+10:
+        if self.y > WIDTH+15:
             self.x = self.sx
             self.y = self.sy
-        if self.y < -10:
+        if self.y < -15:
             self.x = self.sx
             self.y = self.sy
 
@@ -133,8 +141,11 @@ def main():
     player = Ship(WIDTH/2 - 30, HEIGHT/2)
     asts = []
     
-    for i in range(1, 5, round(WIDTH/10)): 
-        asts.append(Asteroid(randint(i, WIDTH), randint(-10, 0)))
+    for i in range(3): 
+        asts.append(Asteroid(randint(0, WIDTH), randint(-10, 0)))
+    
+    for i in range(3): 
+        asts.append(Asteroid(randint(0, WIDTH), randint(HEIGHT, HEIGHT+10)))
 
     clock = p.time.Clock()
 
