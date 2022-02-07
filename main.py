@@ -2,7 +2,7 @@ import pygame as p, os, math
 from random import randint
 p.font.init() # inialises pygame fonts
 
-WIDTH, HEIGHT = 750, 750 # This will change depending on where it was being programmed
+WIDTH, HEIGHT = 750, 750 # This will change depending on which machine it was being programmed
 SHIP_SIZE_X, SHIP_SIZE_Y = 50, 50
 DIS = p.display.set_mode((WIDTH, HEIGHT))
 p.display.set_caption("Big Rocks in Space") # Sets the title of the window
