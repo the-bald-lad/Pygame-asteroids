@@ -12,7 +12,6 @@ white = (255, 255, 255)
 # loading images 
 ASTEROID = p.transform.scale(p.image.load(os.path.join("assets", "asteroid.png")), (60, 60)) 
 SHIP = p.transform.scale(p.image.load(os.path.join("assets", "ship.png")), (SHIP_SIZE_X, SHIP_SIZE_Y))
-
 BG = p.transform.scale(p.image.load(os.path.join("assets", "background-space.jpg")), (WIDTH, HEIGHT))
 
 # classes for objects on the window
@@ -35,10 +34,8 @@ class Ship:
         self.sine = math.sin(math.radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
 
-    
     def draw(self, window):
         window.blit(self.rotatedSurf, self.rotatedRect)
-
 
     def turn_left(self):
         self.angle += 5
@@ -49,7 +46,6 @@ class Ship:
         self.sine = math.sin(math.radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
 
-
     def turn_right(self):
         self.angle -= 5
         self.rotatedSurf = p.transform.rotate(self.ship_img, self.angle)
@@ -59,7 +55,6 @@ class Ship:
         self.sine = math.sin(math.radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
     
-
     def move_forward(self):
         self.x += self.cosine * 6
         self.y -= self.sine * 6
@@ -208,6 +203,7 @@ def main():
         
         # calls the function to redraw the display
         redraw_display()
+
 
 if __name__ == "__main__":
     main()
