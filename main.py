@@ -105,16 +105,16 @@ class Asteroid:
             self.y += 1
     
     def check(self):
-        if self.x > WIDTH:
+        if self.x > WIDTH+10:
             self.x = self.sx
             self.y = self.sy
-        if self.x < 0:
+        if self.x < -10:
             self.x = self.sx
             self.y = self.sy
-        if self.y > WIDTH:
+        if self.y > WIDTH+10:
             self.x = self.sx
             self.y = self.sy
-        if self.y < 0:
+        if self.y < -10:
             self.x = self.sx
             self.y = self.sy
 
