@@ -158,18 +158,18 @@ def main():
         level_label = m_font.render(f"Level: {level}", 1, white)
         hyper_label = m_font.render(f"Hyperspace cooldown: {round(hyper_cooldown/60)}", 1, white)
 
-        DIS.blit(lives_label, (10, 10))
-        DIS.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
-        DIS.blit(hyper_label, (WIDTH/2 - hyper_label.get_width()/2, 10))
-
         player.draw(DIS)
         
         for i in asts:
             i.draw(DIS)
+            
+        DIS.blit(lives_label, (10, 10))
+        DIS.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
+        DIS.blit(hyper_label, (WIDTH/2 - hyper_label.get_width()/2, 10))
 
         p.display.update()
 
-
+    # main loop
     while running:
         clock.tick(FPS)
         hyper_cooldown -= 1 
@@ -180,6 +180,7 @@ def main():
             if event.type == p.QUIT:
                 running = False
         
+        # This returns a dictionary with all keypresses
         keys = p.key.get_pressed()
         if keys[p.K_a]: # left
             player.turn_left()
@@ -189,17 +190,21 @@ def main():
             player.move_forward()
         if keys[p.K_SPACE] and hyper_cooldown <= 0: # hyperspace
             player.hyper_space()
-            player.move_forward()
-            hyper_cooldown = FPS*5
+            player.move_forward() # This is needed to make the ship update on the screen
+            hyper_cooldown = FPS*5 # This is for a 5 second cooldown, since FPS is 60
 
+        # move each asteroid
         for i in asts:
             i.move()
 
+        # check player positions
         player.check()
         
+        # checks each asteroid position
         for i in asts:
             i.check()
         
+        # calls the function to redraw the display
         redraw_display()
 
 if __name__ == "__main__":
