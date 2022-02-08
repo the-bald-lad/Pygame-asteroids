@@ -1,3 +1,4 @@
+from runpy import _ModifiedArgv0
 from gevent import with_timeout
 import pygame as p, os, math 
 from random import randint
@@ -23,7 +24,6 @@ class Ship:
         self.w = SHIP.get_width()
         self.h = SHIP.get_height()
         self.ship_img = SHIP
-        self.laser_img = LASER
         self.mask = p.mask.from_surface(self.ship_img)
         self.health = health
 
@@ -34,14 +34,6 @@ class Ship:
         self.cosine  = math.cos(math.radians(self.angle + 90))
         self.sine = math.sin(math.radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
-        
-        self.angle2 = 0
-        self.rotatedSurf2 = p.transform.rotate(self.ship_img, self.angle)
-        self.rotatedRect2 = self.rotatedSurf.get_rect()
-        self.rotatedRect2.center = (self.x, self.y)
-        self.cosine2  = math.cos(math.radians(self.angle + 90))
-        self.sine2 = math.sin(math.radians(self.angle + 90))
-        self.head2 = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
 
     def draw(self, window):
         window.blit(self.rotatedSurf, self.rotatedRect)
@@ -54,14 +46,6 @@ class Ship:
         self.cosine  = math.cos(math.radians(self.angle + 90))
         self.sine = math.sin(math.radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
-        
-        self.angle2 += 5
-        self.rotatedSurf2 = p.transform.rotate(self.laser_img, self.angle)
-        self.rotatedRect2 = self.rotatedSurf.get_rect()
-        self.rotatedRect2.center = (self.x, self.y)
-        self.cosine2  = math.cos(math.radians(self.angle + 90))
-        self.sine2 = math.sin(math.radians(self.angle + 90))
-        self.head2 = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
 
     def turn_right(self):
         self.angle -= 5
@@ -71,14 +55,6 @@ class Ship:
         self.cosine  = math.cos(math.radians(self.angle + 90))
         self.sine = math.sin(math.radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
-        
-        self.angle2 -= 5
-        self.rotatedSurf2 = p.transform.rotate(self.laser_img, self.angle)
-        self.rotatedRect2 = self.rotatedSurf.get_rect()
-        self.rotatedRect2.center = (self.x, self.y)
-        self.cosine2  = math.cos(math.radians(self.angle + 90))
-        self.sine2 = math.sin(math.radians(self.angle + 90))
-        self.head2 = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
     
     def move_forward(self):
         self.x += self.cosine * 6
@@ -93,9 +69,6 @@ class Ship:
     def hyper_space(self):
         self.x = randint(0, WIDTH-self.ship_img.get_width())
         self.x = randint(0, HEIGHT-self.ship_img.get_width())
-        
-    def shoot(self, window):
-        window.blit(self.rotatedSurf2, self.rotatedRect2)
     
     def check(self):
         if self.x > WIDTH:
@@ -153,15 +126,31 @@ class Asteroid:
     def draw(self, window):
         window.blit(self.ast_img, (self.x, self.y))
 
+class Laser:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.laser_img = LASER
+        self.shoot = False
+
+    def shoot(self):
+        self.shoot = True
+    
+    def draw(self, window):
+        if self.shoot is True:
+            window.blit(self.laser_img, (self.x, self.y))
+    
+    
 # main function
 def main():
     running = True # makes the game loop start
     FPS = 60
-    level, lives = 1, 5
+    level, lives = 0, 5
     m_font = p.font.SysFont("opensans", 50)
     hyper_cooldown = 0
 
     player = Ship(WIDTH/2 - 30, HEIGHT/2)
+    las = Laser(player.x, player.y)
     asts = []
 
     clock = p.time.Clock()
@@ -176,6 +165,7 @@ def main():
         hyper_label = m_font.render(f"Hyperspace cooldown: {round(hyper_cooldown/60)}", 1, WHITE)
 
         player.draw(DIS)
+        las.draw(DIS)
         
         for i in asts:
             i.draw(DIS)
@@ -183,7 +173,7 @@ def main():
         DIS.blit(lives_label, (10, 10))
         DIS.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
         DIS.blit(hyper_label, (WIDTH/2 - hyper_label.get_width()/2, 10))
-        
+                
         p.display.update()
 
     def draw_asts():
@@ -220,7 +210,8 @@ def main():
         if keys[p.K_w]: # up
             player.move_forward()
         if keys[p.K_c]: # c to shoot
-            player.shoot(DIS)
+            las.shoot()
+            
         if keys[p.K_SPACE] and hyper_cooldown <= 0: # hyperspace
             player.hyper_space()
             player.move_forward() # This is needed to make the ship update on the screen
