@@ -27,30 +27,30 @@ class Ship:
         self.health = health
 
         self.angle = 0
-        self.rotatedSurf = p.transform.rotate(self.ship_img, self.angle)
-        self.rotatedRect = self.rotatedSurf.get_rect()
-        self.rotatedRect.center = (self.x, self.y)
+        self.rotated_surf = p.transform.rotate(self.ship_img, self.angle)
+        self.rotated_rect = self.rotated_surf.get_rect()
+        self.rotated_rect.center = (self.x, self.y)
         self.cosine  = math.cos(math.radians(self.angle + 90))
         self.sine = math.sin(math.radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
 
     def draw(self, window):
-        window.blit(self.rotatedSurf, self.rotatedRect)
+        window.blit(self.rotated_surf, self.rotated_rect)
 
     def turn_left(self):
         self.angle += 5
-        self.rotatedSurf = p.transform.rotate(self.ship_img, self.angle)
-        self.rotatedRect = self.rotatedSurf.get_rect()
-        self.rotatedRect.center = (self.x, self.y)
+        self.rotated_surf = p.transform.rotate(self.ship_img, self.angle)
+        self.rotated_rect = self.rotated_surf.get_rect()
+        self.rotated_rect.center = (self.x, self.y)
         self.cosine  = math.cos(math.radians(self.angle + 90))
         self.sine = math.sin(math.radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
 
     def turn_right(self):
         self.angle -= 5
-        self.rotatedSurf = p.transform.rotate(self.ship_img, self.angle)
-        self.rotatedRect = self.rotatedSurf.get_rect()
-        self.rotatedRect.center = (self.x, self.y)
+        self.rotated_surf = p.transform.rotate(self.ship_img, self.angle)
+        self.rotated_rect = self.rotated_surf.get_rect()
+        self.rotated_rect.center = (self.x, self.y)
         self.cosine  = math.cos(math.radians(self.angle + 90))
         self.sine = math.sin(math.radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
@@ -58,9 +58,9 @@ class Ship:
     def move_forward(self):
         self.x += self.cosine * 6
         self.y -= self.sine * 6
-        self.rotatedSurf = p.transform.rotate(self.ship_img, self.angle)
-        self.rotatedRect = self.rotatedSurf.get_rect()
-        self.rotatedRect.center = (self.x, self.y)
+        self.rotated_surf = p.transform.rotate(self.ship_img, self.angle)
+        self.rotated_rect = self.rotated_surf.get_rect()
+        self.rotated_rect.center = (self.x, self.y)
         self.cosine  = math.cos(math.radians(self.angle + 90))
         self.sine = math.sin(math.radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
@@ -182,7 +182,7 @@ def collsion(o1, o2):
 def main():
     running = True # makes the game loop start
     FPS = 60
-    level, lives = 0, 5
+    level, lives = 0, 4
     m_font = p.font.SysFont("opensans", 50)
     l_font = p.font.SysFont("Opensans", 40)
     hyper_cooldown = 0
@@ -199,7 +199,7 @@ def main():
         DIS.blit(BG, (0, 0))
         
         # text
-        lives_label = m_font.render(f"Lives: {lives}", 1, WHITE)
+        lives_label = m_font.render(f"Lives: {lives+1}", 1, WHITE)
         level_label = m_font.render(f"Level: {level}", 1, WHITE)
         hyper_label = m_font.render(f"Hyperspace cooldown: {round(hyper_cooldown/60)}", 1, WHITE)
         lost_life_label = m_font.render("You lost a life", 1, WHITE)
@@ -320,13 +320,12 @@ def main():
         redraw_display()
 
     # end game sequence
-    
     DIS.blit(BG, (0, 0))
     word = "levels" if level > 1 else "level"
     a = "Congratulations!" if level > 5 else "Better luck next time!"
     
     lost_label1 = l_font.render(f"You have lost the game.", 1, WHITE)
-    lost_label2 = l_font.render(f"After completing {level} {word}. {a}", 1, WHITE)
+    lost_label2 = l_font.render(f"You completed {level} {word}. {a}", 1, WHITE)
     
     DIS.blit(lost_label1, (WIDTH/2 - lost_label1.get_width()/2, HEIGHT/2-20))
     DIS.blit(lost_label2, (WIDTH/2 - lost_label2.get_width()/2, HEIGHT/2+20))
