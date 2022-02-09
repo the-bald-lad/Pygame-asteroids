@@ -11,6 +11,7 @@ WHITE = (255, 255, 255) # This is just so i can be lazy and don't have to type o
 # Loading images 
 ASTEROID = p.transform.scale(p.image.load(os.path.join("assets", "asteroid.png")), (60, 60)) 
 SHIP = p.transform.scale(p.image.load(os.path.join("assets", "ship.png")), (SHIP_SIZE_X, SHIP_SIZE_Y))
+LASER = p.image.load(os.path.join("assets", "laser (2).png"))
 BG = p.transform.scale(p.image.load(os.path.join("assets", "background-space.jpg")), (WIDTH, HEIGHT))
 
 # Classes for objects on the window
@@ -128,6 +129,7 @@ class Asteroid:
 
 class Laser(object):
     def __init__(self, head, cosine, sine, lasers):
+        self.laser_img = LASER
         self.point = head
         self.x, self.y = self.point
         self.w = 4
@@ -137,13 +139,11 @@ class Laser(object):
         self.xv = self.c * 10
         self.yv = self.s * 10
         self.lasers = lasers
+        self.mask = p.mask.from_surface(self.laser_img)
         
     def move(self):
-        for laser in self.lasers:
-            self.x += self.xv
-            self.y -= self.yv
-            if laser.offscreen():
-                remove_lasers(self.lasers, laser)
+        self.x += self.xv
+        self.y -= self.yv
         
     def draw(self, window):
         p.draw.rect(window, WHITE, [self.x, self.y, self.w, self.h])
@@ -165,9 +165,6 @@ def collsion(o1, o2):
     offset_x = o2.x - o1.x
     offset_y = o2.y - o1.y
     return o1.mask.overlap(o2.mask, (offset_x, offset_y)) != None
-
-def remove_lasers(ls, obj):
-    ls.remove(obj)
 
 # main function
 def main():
@@ -261,8 +258,16 @@ def main():
             if i.y < 0:
                 player_lasers.remove(i)
 
+
         # check player positions
         player.check()
+        
+        # laser-asteroid colision
+        for i in player_lasers[:]:
+            for j in asts[:]:
+                if i.colide(j):
+                    asts.remove(j)
+                
         
         # checks each asteroid position
         for i in asts:
