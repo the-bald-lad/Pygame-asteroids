@@ -78,17 +78,22 @@ class Ship:
             self.y = 0
         if self.y < 0:
             self.y = HEIGHT
+            
+    def colide(self, obj):
+        return collsion(self, obj)
 
 
 class Asteroid:
-    def __init__(self,x, y, health=100):
+    def __init__(self,x, y, level, health=100):
         self.x = x
         self.y = y
+        self.lvl = level
         self.sx = x # needed for original x value for reset
         self.sy = y # needed for original x value for reset
         self.w = ASTEROID.get_width()
         self.h = ASTEROID.get_height()
         self.rect = ASTEROID.get_rect()
+        self.vel = randint(1, self.lvl)
         
         self.health = health
         self.ast_img = ASTEROID
@@ -97,18 +102,18 @@ class Asteroid:
     def move(self):
         if self.sx < WIDTH/2:
             if self.sy > HEIGHT/2:
-                self.x += 1
-                self.y -= 1
+                self.x += self.vel
+                self.y -= self.vel
             else:
-                self.x += 1
-                self.y += 1
+                self.x += self.vel
+                self.y += self.vel
         else:
             if self.sy > HEIGHT/2:
-                self.x -= 1
-                self.y -=1
+                self.x -= self.vel
+                self.y -= self.vel
             else:
-                self.x -= 1
-                self.y += 1
+                self.x -= self.vel
+                self.y += self.vel
     
     def check(self):
         if self.x > WIDTH+15:
@@ -126,6 +131,13 @@ class Asteroid:
 
     def draw(self, window):
         window.blit(self.ast_img, (self.x, self.y))
+        
+    def colide(self, obj):
+        return collsion(self, obj)
+    
+    def reset(self):
+        self.x = self.sx
+        self.y = self.sy
 
 class Laser(object):
     def __init__(self, head, cosine, sine, lasers):
@@ -173,6 +185,7 @@ def main():
     level, lives = 0, 5
     m_font = p.font.SysFont("opensans", 50)
     hyper_cooldown = 0
+    life_lost = 0
 
     player = Ship(WIDTH/2 - 30, HEIGHT/2)
     player_lasers = []
@@ -188,6 +201,7 @@ def main():
         lives_label = m_font.render(f"Lives: {lives}", 1, WHITE)
         level_label = m_font.render(f"Level: {level}", 1, WHITE)
         hyper_label = m_font.render(f"Hyperspace cooldown: {round(hyper_cooldown/60)}", 1, WHITE)
+        lost_life_label = m_font.render("You lost a life", 1, WHITE)
 
         player.draw(DIS)
         
@@ -196,6 +210,9 @@ def main():
             
         for b in player_lasers:
             b.draw(DIS)
+            
+        if life_lost > 0:
+            DIS.blit(lost_life_label, (WIDTH/2 - lost_life_label.get_width()/2, HEIGHT/2))
             
         DIS.blit(lives_label, (10, 10))
         DIS.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
@@ -206,11 +223,11 @@ def main():
     def draw_asts():
         # adds meteors to the top of the window
         for i in range(level*2): 
-            asts.append(Asteroid(randint(0, WIDTH), randint(-10, 0)))
+            asts.append(Asteroid(randint(0, WIDTH), randint(-10, 0), level))
 
         # adds meteors to the bottom of the window
         for i in range(level*2): 
-            asts.append(Asteroid(randint(0, WIDTH), randint(HEIGHT, HEIGHT+10)))
+            asts.append(Asteroid(randint(0, WIDTH), randint(HEIGHT, HEIGHT+10), level))
 
     # main loop
     while running:
@@ -223,10 +240,15 @@ def main():
             level += 1
             draw_asts()
 
+        if life_lost > 0:
+            life_lost -= 1
+
         # event loop
         for event in p.event.get():
             if event.type == p.QUIT:
                 running = False
+            if event.type == p.KEYDOWN and event.key == p.K_c and len(player_lasers) <= 4:
+                player_lasers.append(Laser(player.head, player.cosine, player.sine, player_lasers))
         
         # This returns a dictionary with all keypresses
         keys = p.key.get_pressed()
@@ -236,8 +258,6 @@ def main():
             player.turn_right()
         if keys[p.K_w]: # up
             player.move_forward()
-        if keys[p.K_c] and len(player_lasers) <= 4: # shoot
-            player_lasers.append(Laser(player.head, player.cosine, player.sine, player_lasers))
         if keys[p.K_SPACE] and hyper_cooldown <= 0: # hyperspace
             player.hyper_space()
             player.move_forward() # This is needed to make the ship update on the screen
@@ -267,7 +287,25 @@ def main():
             for j in asts[:]:
                 if i.colide(j):
                     asts.remove(j)
-                
+                    try:
+                        player_lasers.remove(i)
+                    except(ValueError):
+                        continue
+        
+        for i in asts[:]:
+            if i.colide(player):
+                if lives <= 0:
+                    running = False
+                else:
+                    player.x = WIDTH/2
+                    player.y = WIDTH/2
+                    player.move_forward()
+                    for i in asts:
+                        i.reset()
+                    player_lasers.clear()
+                    lives = lives - 1
+                    life_lost = FPS*2
+                    redraw_display()
         
         # checks each asteroid position
         for i in asts:
