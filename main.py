@@ -223,11 +223,11 @@ def main():
 
     def draw_asts():
         # adds meteors to the top of the window
-        for i in range(level*2): 
+        for i in range(level+1): 
             asts.append(Asteroid(randint(0, WIDTH), randint(-10, 0), level))
 
         # adds meteors to the bottom of the window
-        for i in range(level*2): 
+        for i in range(level+1): 
             asts.append(Asteroid(randint(0, WIDTH), randint(HEIGHT, HEIGHT+10), level))
 
     # main loop
