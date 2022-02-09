@@ -184,9 +184,9 @@ def main():
     FPS = 60
     level, lives = 0, 5
     m_font = p.font.SysFont("opensans", 50)
+    l_font = p.font.SysFont("Opensans", 40)
     hyper_cooldown = 0
     life_lost = 0
-    lost = False
 
     player = Ship(WIDTH/2 - 30, HEIGHT/2)
     player_lasers = []
@@ -320,16 +320,20 @@ def main():
         redraw_display()
 
     # end game sequence
-    if lost is True:
-        DIS.blit(BG, (0, 0))
-        word = "levels" if level > 1 else "level"
-        a = "Congratulations!" if level > 5 else "Better luck next time!"
-        
-        lost_label = m_font.render(f"You have lost the game after completing {level} {word}. {a}", 1, WHITE)
-        
-        DIS.blit(lost_label, (WIDTH/2 - lost_label.get_width()/2, HEIGHT/2))
-        
-        time.sleep(1)
+    
+    DIS.blit(BG, (0, 0))
+    word = "levels" if level > 1 else "level"
+    a = "Congratulations!" if level > 5 else "Better luck next time!"
+    
+    lost_label1 = l_font.render(f"You have lost the game.", 1, WHITE)
+    lost_label2 = l_font.render(f"After completing {level} {word}. {a}", 1, WHITE)
+    
+    DIS.blit(lost_label1, (WIDTH/2 - lost_label1.get_width()/2, HEIGHT/2-20))
+    DIS.blit(lost_label2, (WIDTH/2 - lost_label2.get_width()/2, HEIGHT/2+20))
+    
+    p.display.update()
+    
+    time.sleep(3)
 
 
 if __name__ == "__main__":
