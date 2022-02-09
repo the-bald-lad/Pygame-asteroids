@@ -320,20 +320,22 @@ def main():
         redraw_display()
 
     # end game sequence
-    DIS.blit(BG, (0, 0))
+    a = "Congratulations!" if level > 5 else "Better luck next time!" 
     word = "levels" if level > 1 else "level"
-    a = "Congratulations!" if level > 5 else "Better luck next time!"
-    
-    lost_label1 = l_font.render(f"You have lost the game.", 1, WHITE)
     lost_label2 = l_font.render(f"You completed {level} {word}. {a}", 1, WHITE)
+    lost_label3 = l_font.render("Press the spacebar to exit", 1, WHITE)
+    lost_label1 = l_font.render(f"You have lost the game.", 1, WHITE)
     
+    DIS.blit(BG, (0, 0))
     DIS.blit(lost_label1, (WIDTH/2 - lost_label1.get_width()/2, HEIGHT/2-20))
     DIS.blit(lost_label2, (WIDTH/2 - lost_label2.get_width()/2, HEIGHT/2+20))
-    
+    DIS.blit(lost_label3, (WIDTH/2 - lost_label3.get_width()/2, HEIGHT/2+40))
     p.display.update()
     
-    time.sleep(3)
-
+    while True:
+        keys = p.key.get_pressed()
+        if keys[p.K_SPACE]:
+            break
 
 if __name__ == "__main__":
     main()
