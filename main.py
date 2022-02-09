@@ -1,4 +1,4 @@
-import pygame as p, os, math 
+import pygame as p, os, math, time
 from random import randint
 p.font.init() # inialises pygame fonts
 
@@ -186,6 +186,7 @@ def main():
     m_font = p.font.SysFont("opensans", 50)
     hyper_cooldown = 0
     life_lost = 0
+    lost = False
 
     player = Ship(WIDTH/2 - 30, HEIGHT/2)
     player_lasers = []
@@ -269,14 +270,17 @@ def main():
 
         for i in player_lasers[:]:
             i.move()
-            if i.x > WIDTH:
-                player_lasers.remove(i)
-            if i.x < 0:
-                player_lasers.remove(i)
-            if i.y > HEIGHT:
-                player_lasers.remove(i)
-            if i.y < 0:
-                player_lasers.remove(i)
+            try:
+                if i.x > WIDTH:
+                    player_lasers.remove(i)
+                if i.x < 0:
+                    player_lasers.remove(i)
+                if i.y > HEIGHT:
+                    player_lasers.remove(i)
+                if i.y < 0:
+                    player_lasers.remove(i)
+            except(ValueError):
+                pass
 
 
         # check player positions
@@ -294,8 +298,9 @@ def main():
         
         for i in asts[:]:
             if i.colide(player):
-                if lives <= 0:
+                if lives < 1:
                     running = False
+                    lost = True
                 else:
                     player.x = WIDTH/2
                     player.y = WIDTH/2
@@ -313,6 +318,18 @@ def main():
         
         # calls the function to redraw the display
         redraw_display()
+
+    # end game sequence
+    if lost is True:
+        DIS.blit(BG, (0, 0))
+        word = "levels" if level > 1 else "level"
+        a = "Congratulations!" if level > 5 else "Better luck next time!"
+        
+        lost_label = m_font.render(f"You have lost the game after completing {level} {word}. {a}", 1, WHITE)
+        
+        DIS.blit(lost_label, (WIDTH/2 - lost_label.get_width()/2, HEIGHT/2))
+        
+        time.sleep(1)
 
 
 if __name__ == "__main__":
