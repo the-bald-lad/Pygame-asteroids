@@ -126,21 +126,25 @@ class Asteroid:
     def draw(self, window):
         window.blit(self.ast_img, (self.x, self.y))
 
-class Laser:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.laser_img = LASER
-        self.shoot = False
-
-    def shoot(self):
-        self.shoot = True
-    
+class Laser(object):
+    def __init__(self, head, cosine, sine):
+        self.point = head
+        self.x, self.y = self.point
+        self.w = 4
+        self.h = 4
+        self.c = cosine
+        self.s = sine
+        self.xv = self.c * 10
+        self.yv = self.s * 10
+        
+    def move(self):
+        self.x += self.xv
+        self.y -= self.yv
+        
     def draw(self, window):
-        if self.shoot is True:
-            window.blit(self.laser_img, (self.x, self.y))
-    
-    
+        p.draw.rect(window, WHITE, [self.x, self.y, self.w, self.h])
+        
+
 # main function
 def main():
     running = True # makes the game loop start
@@ -150,7 +154,7 @@ def main():
     hyper_cooldown = 0
 
     player = Ship(WIDTH/2 - 30, HEIGHT/2)
-    las = Laser(player.x, player.y)
+    player_lasers = []
     asts = []
 
     clock = p.time.Clock()
@@ -165,10 +169,12 @@ def main():
         hyper_label = m_font.render(f"Hyperspace cooldown: {round(hyper_cooldown/60)}", 1, WHITE)
 
         player.draw(DIS)
-        las.draw(DIS)
         
         for i in asts:
             i.draw(DIS)
+            
+        for b in player_lasers:
+            b.draw(DIS)
             
         DIS.blit(lives_label, (10, 10))
         DIS.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
@@ -209,9 +215,8 @@ def main():
             player.turn_right()
         if keys[p.K_w]: # up
             player.move_forward()
-        if keys[p.K_c]: # c to shoot
-            las.shoot()
-            
+        if keys[p.K_c] and len(player_lasers) <= 4: # shoot
+            player_lasers.append(Laser(player.head, player.cosine, player.sine))
         if keys[p.K_SPACE] and hyper_cooldown <= 0: # hyperspace
             player.hyper_space()
             player.move_forward() # This is needed to make the ship update on the screen
@@ -220,6 +225,21 @@ def main():
         # move each asteroid
         for i in asts:
             i.move()
+
+        for i in player_lasers:
+            i.move()
+            if i.x > WIDTH:
+                player_lasers.remove(i)
+                continue
+            if i.x < 0:
+                player_lasers.remove(i)
+                continue
+            if i.y > HEIGHT:
+                player_lasers.remove(i)
+                continue
+            if i.y < 0:
+                player_lasers.remove(i)
+                continue
 
         # check player positions
         player.check()
