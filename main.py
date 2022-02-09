@@ -181,12 +181,12 @@ def collsion(o1, o2):
 # main function
 def main():
     running = True # makes the game loop start
+    lost = False
     FPS = 60
     level, lives = 0, 4
     m_font = p.font.SysFont("opensans", 50)
     l_font = p.font.SysFont("Opensans", 40)
-    hyper_cooldown = 0
-    life_lost = 0
+    hyper_cooldown, life_lost =  0, 0
 
     player = Ship(WIDTH/2 - 30, HEIGHT/2)
     player_lasers = []
@@ -232,6 +232,27 @@ def main():
 
     # main loop
     while running:
+        # end game sequence
+        if lost: 
+            a = "Congratulations!" if level > 5 else "Better luck next time!" 
+            word = "levels" if level > 1 else "level"
+            lost_label2 = l_font.render(f"You completed {level} {word}. {a}", 1, WHITE)
+            lost_label3 = l_font.render("Press the spacebar to exit", 1, WHITE)
+            lost_label1 = l_font.render(f"You have lost the game.", 1, WHITE)
+
+            DIS.blit(BG, (0, 0))
+            DIS.blit(lost_label1, (WIDTH/2 - lost_label1.get_width()/2, HEIGHT/2-20))
+            DIS.blit(lost_label2, (WIDTH/2 - lost_label2.get_width()/2, HEIGHT/2+20))
+            DIS.blit(lost_label3, (WIDTH/2 - lost_label3.get_width()/2, HEIGHT/2+40))
+            p.display.update()
+
+            while True:
+                keys = p.key.get_pressed()
+                if keys[p.K_SPACE]:
+                    break
+
+            running = False
+        
         clock.tick(FPS)
         hyper_cooldown -= 1 
         if hyper_cooldown < 0: 
@@ -299,7 +320,6 @@ def main():
         for i in asts[:]:
             if i.colide(player):
                 if lives < 1:
-                    running = False
                     lost = True
                 else:
                     player.x = WIDTH/2
@@ -319,23 +339,6 @@ def main():
         # calls the function to redraw the display
         redraw_display()
 
-    # end game sequence
-    a = "Congratulations!" if level > 5 else "Better luck next time!" 
-    word = "levels" if level > 1 else "level"
-    lost_label2 = l_font.render(f"You completed {level} {word}. {a}", 1, WHITE)
-    lost_label3 = l_font.render("Press the spacebar to exit", 1, WHITE)
-    lost_label1 = l_font.render(f"You have lost the game.", 1, WHITE)
-    
-    DIS.blit(BG, (0, 0))
-    DIS.blit(lost_label1, (WIDTH/2 - lost_label1.get_width()/2, HEIGHT/2-20))
-    DIS.blit(lost_label2, (WIDTH/2 - lost_label2.get_width()/2, HEIGHT/2+20))
-    DIS.blit(lost_label3, (WIDTH/2 - lost_label3.get_width()/2, HEIGHT/2+40))
-    p.display.update()
-    
-    while True:
-        keys = p.key.get_pressed()
-        if keys[p.K_SPACE]:
-            break
 
 if __name__ == "__main__":
     main()
