@@ -146,7 +146,7 @@ class Laser(object):
         self.y -= self.yv
         
     def draw(self, window):
-        p.draw.rect(window, WHITE, [self.x, self.y, self.w, self.h])
+        window.blit(self.laser_img, (self.x, self.y))
         
     def colide(self, obj):
         return collsion(self, obj)
