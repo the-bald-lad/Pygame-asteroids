@@ -14,7 +14,6 @@ WHITE = (255, 255, 255) # This is just so i can be lazy and don't have to type o
 ASTEROID = p.transform.scale(p.image.load(os.path.join("assets", "asteroid.png")), (60, 60)) 
 SHIP = p.transform.scale(p.image.load(os.path.join("assets", "ship.png")), (SHIP_SIZE_X, SHIP_SIZE_Y))
 BG = p.transform.scale(p.image.load(os.path.join("assets", "background-space.jpg")), (WIDTH, HEIGHT))
-LASER = p.transform.scale(p.image.load(os.path.join("assets", "laser.png")), (30, 30)) 
 
 # Classes for objects on the window
 class Ship:
