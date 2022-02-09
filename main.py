@@ -1,5 +1,3 @@
-from runpy import _ModifiedArgv0
-from gevent import with_timeout
 import pygame as p, os, math 
 from random import randint
 p.font.init() # inialises pygame fonts
@@ -22,6 +20,7 @@ class Ship:
         self.y = y
         self.w = SHIP.get_width()
         self.h = SHIP.get_height()
+        self.rect = SHIP.get_rect()
         self.ship_img = SHIP
         self.mask = p.mask.from_surface(self.ship_img)
         self.health = health
@@ -88,10 +87,12 @@ class Asteroid:
         self.sy = y # needed for original x value for reset
         self.w = ASTEROID.get_width()
         self.h = ASTEROID.get_height()
+        self.rect = ASTEROID.get_rect()
         
         self.health = health
         self.ast_img = ASTEROID
-    
+        self.mask = p.mask.from_surface(self.ast_img)
+        
     def move(self):
         if self.sx < WIDTH/2:
             if self.sy > HEIGHT/2:
@@ -126,7 +127,7 @@ class Asteroid:
         window.blit(self.ast_img, (self.x, self.y))
 
 class Laser(object):
-    def __init__(self, head, cosine, sine):
+    def __init__(self, head, cosine, sine, lasers):
         self.point = head
         self.x, self.y = self.point
         self.w = 4
@@ -135,14 +136,38 @@ class Laser(object):
         self.s = sine
         self.xv = self.c * 10
         self.yv = self.s * 10
+        self.lasers = lasers
         
     def move(self):
-        self.x += self.xv
-        self.y -= self.yv
+        for laser in self.lasers:
+            self.x += self.xv
+            self.y -= self.yv
+            if laser.offscreen():
+                remove_lasers(self.lasers, laser)
         
     def draw(self, window):
         p.draw.rect(window, WHITE, [self.x, self.y, self.w, self.h])
         
+    def colide(self, obj):
+        return collsion(self, obj)
+    
+    def offscreen(self):
+        if self.x > WIDTH:
+            return True
+        if self.x < 0:
+            return True
+        if self.y > WIDTH:
+            return True
+        if self.y < 0:
+            return True
+
+def collsion(o1, o2):
+    offset_x = o2.x - o1.x
+    offset_y = o2.y - o1.y
+    return o1.mask.overlap(o2.mask, (offset_x, offset_y)) != None
+
+def remove_lasers(ls, obj):
+    ls.remove(obj)
 
 # main function
 def main():
@@ -215,7 +240,7 @@ def main():
         if keys[p.K_w]: # up
             player.move_forward()
         if keys[p.K_c] and len(player_lasers) <= 4: # shoot
-            player_lasers.append(Laser(player.head, player.cosine, player.sine))
+            player_lasers.append(Laser(player.head, player.cosine, player.sine, player_lasers))
         if keys[p.K_SPACE] and hyper_cooldown <= 0: # hyperspace
             player.hyper_space()
             player.move_forward() # This is needed to make the ship update on the screen
@@ -225,27 +250,23 @@ def main():
         for i in asts:
             i.move()
 
-        for i in player_lasers:
+        for i in player_lasers[:]:
             i.move()
             if i.x > WIDTH:
                 player_lasers.remove(i)
-                continue
             if i.x < 0:
                 player_lasers.remove(i)
-                continue
             if i.y > HEIGHT:
                 player_lasers.remove(i)
-                continue
             if i.y < 0:
                 player_lasers.remove(i)
-                continue
 
         # check player positions
         player.check()
         
         # checks each asteroid position
         for i in asts:
-            i.check()
+            i.check()        
         
         # calls the function to redraw the display
         redraw_display()
