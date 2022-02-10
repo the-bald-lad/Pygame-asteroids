@@ -220,7 +220,7 @@ def start_screen():
         temp_ast1.check()
 
         for event in p.event.get():
-            if event.type == p.QUIT:
+            if event.type == p.QUIT or event.type == p.K_ESCAPE:
                 p.quit()
                 exit()
             elif event.type == p.KEYDOWN and event.key == p.K_h:   
@@ -247,7 +247,7 @@ def ending():
         p.display.update()
         
         for event in p.event.get():
-            if event.type == p.QUIT:
+            if event.type == p.QUIT or event.type == p.K_ESCAPE:
                 end = False
         b += 1
         
@@ -322,7 +322,7 @@ def main():
 
         # event loop
         for event in p.event.get():
-            if event.type == p.QUIT:
+            if event.type == p.QUIT or event.type == p.K_ESCAPE:
                 running = False
             if event.type == p.KEYDOWN and event.key == p.K_c and len(player_lasers) <= 4:
                 player_lasers.append(Laser(player.head, player.cosine, player.sine, player_lasers))
