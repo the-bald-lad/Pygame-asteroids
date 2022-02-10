@@ -189,51 +189,70 @@ def start_screen():
     FPS = 60
     clock = p.time.Clock()
     
-    DIS.blit(BG, (0, 0))
-    
     bs_font = p.font.SysFont("Opensans", 100)
     s_font = p.font.SysFont("Opensans", 60)
     
     temp_ast = Asteroid(WIDTH-100, HEIGHT-100, 1)
+    temp_ast1 = Asteroid(100, HEIGHT-100, 1)
     
     start_label = bs_font.render("Big Rocks In Space!", 1, WHITE)
-    start_label2 = s_font.render("Press space to start", 1, WHITE)
+    start_label2 = s_font.render("Press the H key to start", 1, WHITE)
     
     while start:
+        DIS.blit(BG, (0, 0))
         clock.tick(FPS)
         temp_ast.move()
+        temp_ast1.move()
+        
+        temp_ast.draw(DIS)
+        temp_ast1.draw(DIS)
+        
+        a = p.transform.scale(p.image.load(path.join("assets", "asteroid.png")), (200, 200))
+        
+        DIS.blit(a, (WIDTH/2-a.get_width()+85, HEIGHT/2-a.get_height()-15))
         
         DIS.blit(start_label, (WIDTH/2 - start_label.get_width()/2, HEIGHT/2))
         DIS.blit(start_label2, (WIDTH/2 - start_label2.get_width()/2, HEIGHT/2+start_label.get_height()))
         
-        temp_ast.draw(DIS)
-        
         p.display.update()
         
         temp_ast.check()
+        temp_ast1.check()
 
         for event in p.event.get():
             if event.type == p.QUIT:
                 p.quit()
                 exit()
-            elif event.type == p.KEYDOWN and event.key == p.K_SPACE:   
+            elif event.type == p.KEYDOWN and event.key == p.K_h:   
                 start = False
 
 
 def ending():
     global level, lost
+    clock = p.time.Clock()
+    FPS = 60
     l_font = p.font.SysFont("Opensans", 40)
     a = "Congratulations!" if level > 5 else "Better luck next time!" 
     word = "levels" if level > 1 else "level"
     lost_label2 = l_font.render(f"You completed {level} {word}. {a}", 1, WHITE)
     lost_label1 = l_font.render(f"You have lost the game.", 1, WHITE)
 
-    DIS.blit(BG, (0, 0))
-    DIS.blit(lost_label1, (WIDTH/2 - lost_label1.get_width()/2, HEIGHT/2-20))
-    DIS.blit(lost_label2, (WIDTH/2 - lost_label2.get_width()/2, HEIGHT/2+20))
-    p.display.update()
-    
-    sleep(5)
+    end = True
+    b = 0
+    while end:
+        clock.tick(FPS)
+        DIS.blit(BG, (0, 0))
+        DIS.blit(lost_label1, (WIDTH/2 - lost_label1.get_width()/2, HEIGHT/2-20))
+        DIS.blit(lost_label2, (WIDTH/2 - lost_label2.get_width()/2, HEIGHT/2+20))
+        p.display.update()
+        
+        for event in p.event.get():
+            if event.type == p.QUIT:
+                end = False
+        b += 1
+        
+        if b == FPS*4:
+            end = False
 
 # main function
 def main():
