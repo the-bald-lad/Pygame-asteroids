@@ -251,7 +251,7 @@ def ending():
                 end = False
         b += 1
         
-        if b == FPS*4:
+        if b >= FPS*4:
             end = False
 
 # main function
