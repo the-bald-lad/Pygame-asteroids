@@ -21,7 +21,7 @@ BG = p.transform.scale(p.image.load(path.join("assets", "background-space.jpg"))
 
 # Classes for objects on the window
 class Ship:
-    def __init__(self, x, y, health=100):
+    def __init__(self, x, y):
         self.x = x
         self.y = y
         self.w = SHIP.get_width()
@@ -29,7 +29,6 @@ class Ship:
         self.rect = SHIP.get_rect()
         self.ship_img = SHIP
         self.mask = p.mask.from_surface(self.ship_img)
-        self.health = health
 
         self.angle = 0
         self.rotated_surf = p.transform.rotate(self.ship_img, self.angle)
@@ -43,7 +42,7 @@ class Ship:
         window.blit(self.rotated_surf, self.rotated_rect)
 
     def turn_left(self):
-        self.angle += 5
+        self.angle += 4
         self.rotated_surf = p.transform.rotate(self.ship_img, self.angle)
         self.rotated_rect = self.rotated_surf.get_rect()
         self.rotated_rect.center = (self.x, self.y)
@@ -52,7 +51,7 @@ class Ship:
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
 
     def turn_right(self):
-        self.angle -= 5
+        self.angle -= 4
         self.rotated_surf = p.transform.rotate(self.ship_img, self.angle)
         self.rotated_rect = self.rotated_surf.get_rect()
         self.rotated_rect.center = (self.x, self.y)
@@ -89,7 +88,7 @@ class Ship:
 
 
 class Asteroid:
-    def __init__(self,x, y, level, health=100):
+    def __init__(self,x, y, level):
         self.x = x
         self.y = y
         self.lvl = level
@@ -100,7 +99,6 @@ class Asteroid:
         self.rect = ASTEROID.get_rect()
         self.vel = randint(1, self.lvl)
         
-        self.health = health
         self.ast_img = ASTEROID
         self.mask = p.mask.from_surface(self.ast_img)
         
@@ -192,8 +190,8 @@ def start_screen():
     bs_font = p.font.SysFont("Opensans", 100)
     s_font = p.font.SysFont("Opensans", 60)
     
-    temp_ast = Asteroid(WIDTH-100, HEIGHT-100, 1)
-    temp_ast1 = Asteroid(100, HEIGHT-100, 1)
+    temp_ast = Asteroid(randint(WIDTH-200, WIDTH-100), HEIGHT+10, 1)
+    temp_ast1 = Asteroid(randint(200, 300), -10, 1)
     
     start_label = bs_font.render("Big Rocks In Space!", 1, WHITE)
     start_label2 = s_font.render("Press the H key to start", 1, WHITE)
@@ -220,7 +218,7 @@ def start_screen():
         temp_ast1.check()
 
         for event in p.event.get():
-            if event.type == p.QUIT or event.type == p.K_ESCAPE:
+            if event.type == p.QUIT or event.type == p.KEYDOWN and event.key == p.K_ESCAPE:
                 p.quit()
                 exit()
             elif event.type == p.KEYDOWN and event.key == p.K_h:   
@@ -323,7 +321,8 @@ def main():
         # event loop
         for event in p.event.get():
             if event.type == p.QUIT or event.type == p.K_ESCAPE:
-                running = False
+                p.quit()
+                exit()
             if event.type == p.KEYDOWN and event.key == p.K_c and len(player_lasers) <= 4:
                 player_lasers.append(Laser(player.head, player.cosine, player.sine, player_lasers))
         
