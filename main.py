@@ -1,3 +1,5 @@
+from distutils.log import error
+from warnings import catch_warnings
 import pygame as p
 from math import cos, sin, radians
 from os import path
@@ -181,8 +183,45 @@ def collsion(o1, o2):
     offset_y = o2.y - o1.y
     return o1.mask.overlap(o2.mask, (offset_x, offset_y)) != None
 
+
+def start_screen():
+    start = True
+    FPS = 60
+    clock = p.time.Clock()
+    
+    DIS.blit(BG, (0, 0))
+    
+    bs_font = p.font.SysFont("Opensans", 100)
+    s_font = p.font.SysFont("Opensans", 60)
+    
+    temp_ast = Asteroid(WIDTH-100, HEIGHT-100, 1)
+    
+    start_label = bs_font.render("Big Rocks In Space!", 1, WHITE)
+    start_label2 = s_font.render("Press space to start", 1, WHITE)
+    
+    while start:
+        clock.tick(FPS)
+        temp_ast.move()
+        
+        DIS.blit(start_label, (WIDTH/2 - start_label.get_width()/2, HEIGHT/2))
+        DIS.blit(start_label2, (WIDTH/2 - start_label2.get_width()/2, HEIGHT/2+start_label.get_height()))
+        
+        temp_ast.draw(DIS)
+        
+        p.display.update()
+        
+        temp_ast.check()
+
+        for event in p.event.get():
+            if event.type == p.QUIT:
+                p.quit()
+                exit()
+            elif event.type == p.KEYDOWN and event.key == p.K_SPACE:   
+                start = False
+
+
 def ending():
-    global level
+    global level, lost
     l_font = p.font.SysFont("Opensans", 40)
     a = "Congratulations!" if level > 5 else "Better luck next time!" 
     word = "levels" if level > 1 else "level"
@@ -198,9 +237,10 @@ def ending():
 
 # main function
 def main():
-    global level
+    global level, lost
     running = True # makes the game loop start
     FPS = 60
+    lost = False
     level, lives = 0, 4
     m_font = p.font.SysFont("opensans", 50)
     hyper_cooldown, life_lost =  0, 0
@@ -316,6 +356,7 @@ def main():
         for i in asts[:]:
             if i.colide(player):
                 if lives < 1:
+                    lost = True
                     running = False
                 else:
                     player.x = WIDTH/2
@@ -337,5 +378,6 @@ def main():
 
 
 if __name__ == "__main__":
+    start_screen()
     main()
     ending()
