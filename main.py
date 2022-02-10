@@ -1,4 +1,7 @@
-import pygame as p, os, math, time
+import pygame as p
+from math import cos, sin, radians
+from os import path
+from time import sleep
 from random import randint
 p.font.init() # inialises pygame fonts
 
@@ -9,10 +12,10 @@ p.display.set_caption("Big Rocks in Space") # Sets the title of the window
 WHITE = (255, 255, 255) # This is just so i can be lazy and don't have to type out the 3 numbers every time
 
 # Loading images 
-ASTEROID = p.transform.scale(p.image.load(os.path.join("assets", "asteroid.png")), (60, 60)) 
-SHIP = p.transform.scale(p.image.load(os.path.join("assets", "ship.png")), (SHIP_SIZE_X, SHIP_SIZE_Y))
-LASER = p.image.load(os.path.join("assets", "laser (2).png"))
-BG = p.transform.scale(p.image.load(os.path.join("assets", "background-space.jpg")), (WIDTH, HEIGHT))
+ASTEROID = p.transform.scale(p.image.load(path.join("assets", "asteroid.png")), (60, 60)) 
+SHIP = p.transform.scale(p.image.load(path.join("assets", "ship.png")), (SHIP_SIZE_X, SHIP_SIZE_Y))
+LASER = p.image.load(path.join("assets", "laser (2).png"))
+BG = p.transform.scale(p.image.load(path.join("assets", "background-space.jpg")), (WIDTH, HEIGHT))
 
 # Classes for objects on the window
 class Ship:
@@ -30,8 +33,8 @@ class Ship:
         self.rotated_surf = p.transform.rotate(self.ship_img, self.angle)
         self.rotated_rect = self.rotated_surf.get_rect()
         self.rotated_rect.center = (self.x, self.y)
-        self.cosine  = math.cos(math.radians(self.angle + 90))
-        self.sine = math.sin(math.radians(self.angle + 90))
+        self.cosine  = cos(radians(self.angle + 90))
+        self.sine = sin(radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
 
     def draw(self, window):
@@ -42,8 +45,8 @@ class Ship:
         self.rotated_surf = p.transform.rotate(self.ship_img, self.angle)
         self.rotated_rect = self.rotated_surf.get_rect()
         self.rotated_rect.center = (self.x, self.y)
-        self.cosine  = math.cos(math.radians(self.angle + 90))
-        self.sine = math.sin(math.radians(self.angle + 90))
+        self.cosine  = cos(radians(self.angle + 90))
+        self.sine = sin(radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
 
     def turn_right(self):
@@ -51,8 +54,8 @@ class Ship:
         self.rotated_surf = p.transform.rotate(self.ship_img, self.angle)
         self.rotated_rect = self.rotated_surf.get_rect()
         self.rotated_rect.center = (self.x, self.y)
-        self.cosine  = math.cos(math.radians(self.angle + 90))
-        self.sine = math.sin(math.radians(self.angle + 90))
+        self.cosine  = cos(radians(self.angle + 90))
+        self.sine = sin(radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
     
     def move_forward(self):
@@ -61,8 +64,8 @@ class Ship:
         self.rotated_surf = p.transform.rotate(self.ship_img, self.angle)
         self.rotated_rect = self.rotated_surf.get_rect()
         self.rotated_rect.center = (self.x, self.y)
-        self.cosine  = math.cos(math.radians(self.angle + 90))
-        self.sine = math.sin(math.radians(self.angle + 90))
+        self.cosine  = cos(radians(self.angle + 90))
+        self.sine = sin(radians(self.angle + 90))
         self.head = (self.x + self.cosine * self.w//2, self.y - self.sine * self.h//2)
     
     def hyper_space(self):
@@ -178,14 +181,28 @@ def collsion(o1, o2):
     offset_y = o2.y - o1.y
     return o1.mask.overlap(o2.mask, (offset_x, offset_y)) != None
 
+def ending():
+    global level
+    l_font = p.font.SysFont("Opensans", 40)
+    a = "Congratulations!" if level > 5 else "Better luck next time!" 
+    word = "levels" if level > 1 else "level"
+    lost_label2 = l_font.render(f"You completed {level} {word}. {a}", 1, WHITE)
+    lost_label1 = l_font.render(f"You have lost the game.", 1, WHITE)
+
+    DIS.blit(BG, (0, 0))
+    DIS.blit(lost_label1, (WIDTH/2 - lost_label1.get_width()/2, HEIGHT/2-20))
+    DIS.blit(lost_label2, (WIDTH/2 - lost_label2.get_width()/2, HEIGHT/2+20))
+    p.display.update()
+    
+    sleep(5)
+
 # main function
 def main():
+    global level
     running = True # makes the game loop start
-    lost = False
     FPS = 60
     level, lives = 0, 4
     m_font = p.font.SysFont("opensans", 50)
-    l_font = p.font.SysFont("Opensans", 40)
     hyper_cooldown, life_lost =  0, 0
 
     player = Ship(WIDTH/2 - 30, HEIGHT/2)
@@ -232,27 +249,6 @@ def main():
 
     # main loop
     while running:
-        # end game sequence
-        if lost: 
-            a = "Congratulations!" if level > 5 else "Better luck next time!" 
-            word = "levels" if level > 1 else "level"
-            lost_label2 = l_font.render(f"You completed {level} {word}. {a}", 1, WHITE)
-            lost_label3 = l_font.render("Press the spacebar to exit", 1, WHITE)
-            lost_label1 = l_font.render(f"You have lost the game.", 1, WHITE)
-
-            DIS.blit(BG, (0, 0))
-            DIS.blit(lost_label1, (WIDTH/2 - lost_label1.get_width()/2, HEIGHT/2-20))
-            DIS.blit(lost_label2, (WIDTH/2 - lost_label2.get_width()/2, HEIGHT/2+20))
-            DIS.blit(lost_label3, (WIDTH/2 - lost_label3.get_width()/2, HEIGHT/2+40))
-            p.display.update()
-
-            while True:
-                keys = p.key.get_pressed()
-                if keys[p.K_SPACE]:
-                    break
-
-            running = False
-        
         clock.tick(FPS)
         hyper_cooldown -= 1 
         if hyper_cooldown < 0: 
@@ -320,7 +316,7 @@ def main():
         for i in asts[:]:
             if i.colide(player):
                 if lives < 1:
-                    lost = True
+                    running = False
                 else:
                     player.x = WIDTH/2
                     player.y = WIDTH/2
@@ -342,3 +338,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    ending()
