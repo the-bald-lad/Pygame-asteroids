@@ -15,6 +15,7 @@ WHITE = (255, 255, 255) # This is just so i can be lazy and don't have to type o
 
 # Loading images 
 ASTEROID = p.transform.scale(p.image.load(path.join("assets", "asteroid.png")), (60, 60)) 
+SMALL_ASTEROID =  p.transform.scale(ASTEROID, (30, 30)) 
 SHIP = p.transform.scale(p.image.load(path.join("assets", "ship.png")), (SHIP_SIZE_X, SHIP_SIZE_Y))
 LASER = p.image.load(path.join("assets", "laser (2).png"))
 BG = p.transform.scale(p.image.load(path.join("assets", "background-space.jpg")), (WIDTH, HEIGHT))
@@ -141,6 +142,63 @@ class Asteroid:
     def reset(self):
         self.x = self.sx
         self.y = self.sy
+
+
+class Asteroid2:
+    def __init__(self,x, y, level):
+        self.x = x
+        self.y = y
+        self.lvl = level
+        self.sx = x # needed for original x value for reset
+        self.sy = y # needed for original x value for reset
+        self.w = ASTEROID.get_width()
+        self.h = ASTEROID.get_height()
+        self.rect = ASTEROID.get_rect()
+        self.vel = randint(1, self.lvl)
+        
+        self.ast_img = SMALL_ASTEROID
+        self.mask = p.mask.from_surface(self.ast_img)
+        
+    def move(self):
+        if self.sx < WIDTH/2:
+            if self.sy > HEIGHT/2:
+                self.x += self.vel
+                self.y -= self.vel
+            else:
+                self.x += self.vel
+                self.y += self.vel
+        else:
+            if self.sy > HEIGHT/2:
+                self.x -= self.vel
+                self.y -= self.vel
+            else:
+                self.x -= self.vel
+                self.y += self.vel
+    
+    def check(self):
+        if self.x > WIDTH+15:
+            self.x = self.sx
+            self.y = self.sy
+        if self.x < -15:
+            self.x = self.sx
+            self.y = self.sy
+        if self.y > WIDTH+15:
+            self.x = self.sx
+            self.y = self.sy
+        if self.y < -15:
+            self.x = self.sx
+            self.y = self.sy
+
+    def draw(self, window):
+        window.blit(self.ast_img, (self.x, self.y))
+        
+    def colide(self, obj):
+        return collsion(self, obj)
+    
+    def reset(self):
+        self.x = self.sx
+        self.y = self.sy
+
 
 class Laser(object):
     def __init__(self, head, cosine, sine, lasers):
@@ -366,6 +424,8 @@ def main():
             for j in asts[:]:
                 if i.colide(j):
                     asts.remove(j)
+                    for k in range(2):
+                        asts.append(Asteroid2(i.x, i.y, level))
                     try:
                         player_lasers.remove(i)
                     except(ValueError):
