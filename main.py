@@ -1,9 +1,6 @@
-from distutils.log import error
-from warnings import catch_warnings
 import pygame as p
 from math import cos, sin, radians
 from os import path
-from time import sleep
 from random import randint
 p.font.init() # inialises pygame fonts
 
