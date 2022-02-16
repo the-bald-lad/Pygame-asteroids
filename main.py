@@ -424,8 +424,6 @@ def main():
             for j in asts[:]:
                 if i.colide(j):
                     asts.remove(j)
-                    for k in range(2):
-                        asts.append(Asteroid2(i.x, i.y, level))
                     try:
                         player_lasers.remove(i)
                     except(ValueError):
