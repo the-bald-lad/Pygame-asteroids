@@ -159,21 +159,13 @@ class Asteroid2:
         self.ast_img = SMALL_ASTEROID
         self.mask = p.mask.from_surface(self.ast_img)
         
-    def move(self):
-        if self.sx < WIDTH/2:
-            if self.sy > HEIGHT/2:
-                self.x += self.vel
-                self.y -= self.vel
-            else:
-                self.x += self.vel
-                self.y += self.vel
+    def move(self, num):
+        if num % 2 == 0:
+            self.x += self.vel
+            self.y += self.vel
         else:
-            if self.sy > HEIGHT/2:
-                self.x -= self.vel
-                self.y -= self.vel
-            else:
-                self.x -= self.vel
-                self.y += self.vel
+            self.x -= self.vel
+            self.y -= self.vel
     
     def check(self):
         if self.x > WIDTH+15:
@@ -322,7 +314,7 @@ def main():
 
     player = Ship(WIDTH/2 - 30, HEIGHT/2)
     player_lasers = []
-    asts = []
+    asts, small_asts = [], []
 
     clock = p.time.Clock()
 
@@ -340,6 +332,9 @@ def main():
         
         for i in asts:
             i.draw(DIS)
+            
+        for i in small_asts:
+            i[1].draw(DIS)
             
         for b in player_lasers:
             b.draw(DIS)
@@ -369,7 +364,7 @@ def main():
         if hyper_cooldown < 0: 
             hyper_cooldown = 0
         
-        if len(asts) == 0:
+        if len(asts) == 0 and len(small_asts) == 0:
             level += 1
             draw_asts()
 
@@ -400,6 +395,9 @@ def main():
         # move each asteroid
         for i in asts:
             i.move()
+            
+        for i in small_asts:
+            i[1].move(i[0])
 
         for i in player_lasers[:]:
             i.move()
@@ -423,7 +421,18 @@ def main():
         for i in player_lasers[:]:
             for j in asts[:]:
                 if i.colide(j):
+                    for k in range(2):
+                        small_asts.append([k, Asteroid2(j.x, j.y, level)])
                     asts.remove(j)
+                    try:
+                        player_lasers.remove(i)
+                    except(ValueError):
+                        continue
+        
+        for i in player_lasers[:]:
+            for j in small_asts[:]:
+                if i.colide(j[1]):
+                    small_asts.remove(j)
                     try:
                         player_lasers.remove(i)
                     except(ValueError):
@@ -447,7 +456,10 @@ def main():
         
         # checks each asteroid position
         for i in asts:
-            i.check()        
+            i.check()   
+            
+        for i in small_asts:
+            i[1].check()      
         
         # calls the function to redraw the display
         redraw_display()
