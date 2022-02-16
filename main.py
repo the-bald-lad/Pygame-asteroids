@@ -148,9 +148,9 @@ class Asteroid2:
     def __init__(self,x, y, level):
         self.x = x
         self.y = y
+        self.sx = self.x
+        self.sy = self.y
         self.lvl = level
-        self.sx = x # needed for original x value for reset
-        self.sy = y # needed for original x value for reset
         self.w = ASTEROID.get_width()
         self.h = ASTEROID.get_height()
         self.rect = ASTEROID.get_rect()
@@ -168,16 +168,16 @@ class Asteroid2:
             self.y -= self.vel
     
     def check(self):
-        if self.x > WIDTH+15:
+        if self.x > WIDTH:
             self.x = self.sx
             self.y = self.sy
-        if self.x < -15:
+        if self.x < 0:
             self.x = self.sx
             self.y = self.sy
-        if self.y > WIDTH+15:
+        if self.y < 0:
             self.x = self.sx
             self.y = self.sy
-        if self.y < -15:
+        if self.y > HEIGHT:
             self.x = self.sx
             self.y = self.sy
 
