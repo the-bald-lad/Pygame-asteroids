@@ -399,6 +399,7 @@ def main():
         for i in small_asts:
             i[1].move(i[0])
 
+        # laser move loop
         for i in player_lasers[:]:
             i.move()
             try:
@@ -412,7 +413,6 @@ def main():
                     player_lasers.remove(i)
             except(ValueError):
                 pass
-
 
         # check player positions
         player.check()
@@ -438,6 +438,7 @@ def main():
                     except(ValueError):
                         continue
         
+        # checks for asteroid colisions with the player
         for i in asts[:]:
             if i.colide(player):
                 if lives < 1:
@@ -447,8 +448,28 @@ def main():
                     player.x = WIDTH/2
                     player.y = WIDTH/2
                     player.move_forward()
+                    for h in small_asts:
+                        h[1].reset()
                     for i in asts:
                         i.reset()
+                    player_lasers.clear()
+                    lives = lives - 1
+                    life_lost = FPS*2
+                    redraw_display()
+        
+        for i in small_asts[:]:
+            if i[1].colide(player):
+                if lives < 1:
+                    lost = True
+                    running = False
+                else:
+                    player.x = WIDTH/2
+                    player.y = WIDTH/2
+                    player.move_forward()
+                    for h in asts:
+                        h.reset()
+                    for i in small_asts:
+                        i[1].reset()
                     player_lasers.clear()
                     lives = lives - 1
                     life_lost = FPS*2
