@@ -246,6 +246,7 @@ def start_screen():
     start_label = bs_font.render("Big Rocks In Space!", 1, WHITE)
     start_label2 = s_font.render("Press the H key to start", 1, WHITE)
     
+    # starting loop
     while start:
         DIS.blit(BG, (0, 0))
         clock.tick(FPS)
@@ -267,6 +268,7 @@ def start_screen():
         temp_ast.check()
         temp_ast1.check()
 
+        # event loop
         for event in p.event.get():
             if event.type == p.QUIT or event.type == p.KEYDOWN and event.key == p.K_ESCAPE:
                 p.quit()
@@ -287,6 +289,8 @@ def ending():
 
     end = True
     b = 0
+    
+    # ending loop
     while end:
         clock.tick(FPS)
         DIS.blit(BG, (0, 0))
@@ -294,6 +298,7 @@ def ending():
         DIS.blit(lost_label2, (WIDTH/2 - lost_label2.get_width()/2, HEIGHT/2+20))
         p.display.update()
         
+        # event loop
         for event in p.event.get():
             if event.type == p.QUIT or event.type == p.K_ESCAPE:
                 end = False
@@ -306,17 +311,17 @@ def ending():
 def main():
     global level, lost
     running = True # makes the game loop start
-    FPS = 60
+    FPS = 60 # so that the game refreshes at a constant rate
     lost = False
     level, lives = 0, 4
-    m_font = p.font.SysFont("opensans", 50)
+    m_font = p.font.SysFont("opensans", 50) # sets a font object to be able to draw text to the screen
     hyper_cooldown, life_lost =  0, 0
 
-    player = Ship(WIDTH/2 - 30, HEIGHT/2)
+    player = Ship(WIDTH/2 - 30, HEIGHT/2) # places ship in centre of screen
     player_lasers = []
     asts, small_asts = [], []
 
-    clock = p.time.Clock()
+    clock = p.time.Clock() # sets a clock object so game follows a specified FPS
 
     #function to redraw the window
     def redraw_display():
@@ -328,14 +333,17 @@ def main():
         hyper_label = m_font.render(f"Hyperspace cooldown: {round(hyper_cooldown/60)}", 1, WHITE)
         lost_life_label = m_font.render("You lost a life", 1, WHITE)
 
+        # place player on screen
         player.draw(DIS)
         
+        # place all asteroids on screen
         for i in asts:
             i.draw(DIS)
             
         for i in small_asts:
             i[1].draw(DIS)
             
+        # place all lasers on screen    
         for b in player_lasers:
             b.draw(DIS)
             
@@ -359,15 +367,19 @@ def main():
 
     # main loop
     while running:
-        clock.tick(FPS)
+        clock.tick(FPS) # sets frames per second to specified FPS
+        
+        # loop for checking to see if hyper cooldown is completed
         hyper_cooldown -= 1 
         if hyper_cooldown < 0: 
             hyper_cooldown = 0
-        
+            
+        # checks for a level complete
         if len(asts) == 0 and len(small_asts) == 0:
             level += 1
             draw_asts()
 
+        # checks for game over event
         if life_lost > 0:
             life_lost -= 1
 
@@ -376,21 +388,20 @@ def main():
             if event.type == p.QUIT or event.type == p.K_ESCAPE:
                 p.quit()
                 exit()
-            if event.type == p.KEYDOWN and event.key == p.K_c and len(player_lasers) <= 4:
+            if event.type == p.KEYDOWN and event.key == p.K_c and len(player_lasers) <= 4: # cannot hold down laser button to fire a huge amount
                 player_lasers.append(Laser(player.head, player.cosine, player.sine, player_lasers))
         
-        # This returns a dictionary with all keypresses
-        keys = p.key.get_pressed()
-        if keys[p.K_a]: # left
+        keys = p.key.get_pressed() # This returns a dictionary containing all keys pressed
+        if keys[p.K_a]: # rotate left
             player.turn_left()
-        if keys[p.K_d]: # right
+        if keys[p.K_d]: # rotate right
             player.turn_right()
-        if keys[p.K_w]: # up
+        if keys[p.K_w]: # move forward
             player.move_forward()
         if keys[p.K_SPACE] and hyper_cooldown <= 0: # hyperspace
             player.hyper_space()
             player.move_forward() # This is needed to make the ship update on the screen
-            hyper_cooldown = FPS*5 # This is for a 5 second cooldown, since FPS is 60
+            hyper_cooldown = FPS*5 # This is for a 5 second cooldown
 
         # move each asteroid
         for i in asts:
