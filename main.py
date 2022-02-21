@@ -69,7 +69,7 @@ class Ship:
     
     def hyper_space(self):
         self.x = randint(0, WIDTH-self.ship_img.get_width())
-        self.x = randint(0, HEIGHT-self.ship_img.get_width())
+        self.y = randint(0, HEIGHT-self.ship_img.get_width())
     
     def check(self):
         if self.x > WIDTH:
