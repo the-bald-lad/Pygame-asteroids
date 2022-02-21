@@ -145,8 +145,6 @@ class Asteroid2:
     def __init__(self,x, y, level):
         self.x = x
         self.y = y
-        self.sx = self.x
-        self.sy = self.y
         self.lvl = level
         self.w = ASTEROID.get_width()
         self.h = ASTEROID.get_height()
@@ -166,17 +164,13 @@ class Asteroid2:
     
     def check(self):
         if self.x > WIDTH:
-            self.x = self.sx
-            self.y = self.sy
+            self.x = 0
         if self.x < 0:
-            self.x = self.sx
-            self.y = self.sy
+            self.x = WIDTH
         if self.y < 0:
-            self.x = self.sx
-            self.y = self.sy
+            self.y = HEIGHT
         if self.y > HEIGHT:
-            self.x = self.sx
-            self.y = self.sy
+            self.y = 0
 
     def draw(self, window):
         window.blit(self.ast_img, (self.x, self.y))
@@ -185,8 +179,8 @@ class Asteroid2:
         return collsion(self, obj)
     
     def reset(self):
-        self.x = self.sx
-        self.y = self.sy
+        self.x = randint(0, WIDTH)
+        self.y = randint(0, HEIGHT)
 
 
 class Laser(object):
