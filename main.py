@@ -26,7 +26,7 @@ class Ship:
         self.h = SHIP.get_height()
         self.rect = SHIP.get_rect()
         self.ship_img = SHIP
-        self.mask = p.mask.from_surface(self.ship_img)
+        self.mask = p.mask.from_surface(self.ship_img) # for colision
 
         self.angle = 0
         self.rotated_surf = p.transform.rotate(self.ship_img, self.angle)
