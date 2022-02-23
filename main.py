@@ -149,7 +149,7 @@ class Asteroid2:
         self.w = ASTEROID.get_width()
         self.h = ASTEROID.get_height()
         self.rect = ASTEROID.get_rect()
-        self.vel = randint(1, self.lvl)
+        self.vel = level+1
         
         self.ast_img = SMALL_ASTEROID
         self.mask = p.mask.from_surface(self.ast_img)
@@ -216,6 +216,7 @@ class Laser(object):
             return True
         if self.y < 0:
             return True
+
 
 def collsion(o1, o2):
     offset_x = o2.x - o1.x
