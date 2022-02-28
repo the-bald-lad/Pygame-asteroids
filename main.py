@@ -2,6 +2,9 @@ import pygame as p
 from math import cos, sin, radians
 from os import path
 from random import randint
+
+Cheese_Mode = False ##Enable for Cheese.
+
 p.font.init() # inialises pygame fonts
 
 WIDTH, HEIGHT = 750, 750 # This will change depending on which machine it was being programmed
@@ -13,7 +16,8 @@ WHITE = (255, 255, 255) # This is just so i can be lazy and don't have to type o
 # Loading images 
 ASTEROID = p.transform.scale(p.image.load(path.join("assets", "asteroid.png")), (60, 60)) 
 SMALL_ASTEROID =  p.transform.scale(ASTEROID, (30, 30)) 
-SHIP = p.transform.scale(p.image.load(path.join("assets", "ship.png")), (SHIP_SIZE_X, SHIP_SIZE_Y))
+if Cheese_Mode == False: SHIP = p.transform.scale(p.image.load(path.join("assets", "ship.png")), (SHIP_SIZE_X, SHIP_SIZE_Y))
+else: SHIP = p.transform.scale(p.image.load(path.join("assets", "cheese.png")), (SHIP_SIZE_X, SHIP_SIZE_Y))
 LASER = p.image.load(path.join("assets", "laser (2).png"))
 BG = p.transform.scale(p.image.load(path.join("assets", "background-space.jpg")), (WIDTH, HEIGHT))
 
