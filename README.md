@@ -1,3 +1,3 @@
 # Pygame-asteroids
 
-A simple asteroids clone made in pygame
+A simple asteroids clone made in pygame using Python
