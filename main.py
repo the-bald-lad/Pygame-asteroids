@@ -1,17 +1,22 @@
-# cheese
-import pygame as p
+# High Score: Matt Level 4
+
+# Imports
 from math import cos, sin, radians # needed for turning the player
 from os import path
 from random import randint
-p.font.init() # inialises pygame fonts
+import pygame as p
 
+# inialises pygame fonts
+p.font.init()
+
+# Constant Variables
 WIDTH, HEIGHT = 750, 750 # This will change depending on which machine it was being programmed
 SHIP_SIZE_X, SHIP_SIZE_Y = 50, 50
 DIS = p.display.set_mode((WIDTH, HEIGHT))
 p.display.set_caption("Big Rocks in Space") # Sets the title of the window
 WHITE = (255, 255, 255) # This is just so i can be lazy and don't have to type out the 3 numbers every time
 
-# Loading images 
+# Loading assets
 ASTEROID = p.transform.scale(p.image.load(path.join("assets", "asteroid.png")), (60, 60)) 
 SMALL_ASTEROID =  p.transform.scale(ASTEROID, (30, 30))
 SHIP = p.transform.scale(p.image.load(path.join("assets", "ship.png")), (SHIP_SIZE_X, SHIP_SIZE_Y))
@@ -19,7 +24,7 @@ LASER = p.image.load(path.join("assets", "laser (2).png"))
 BG = p.transform.scale(p.image.load(path.join("assets", "background-space.jpg")), (WIDTH, HEIGHT))
 
 # Classes for objects on the window
-class Ship:
+class Ship: # for the player ship
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -74,8 +79,8 @@ class Ship:
     
     # This randomises the ships position when called
     def hyper_space(self):
-        self.x = randint(0, WIDTH-self.ship_img.get_width())
-        self.y = randint(0, HEIGHT-self.ship_img.get_width())
+        self.x = randint(0, WIDTH-self.w)
+        self.y = randint(0, HEIGHT-self.h)
     
     # Checks for border colisions
     def check(self):
@@ -127,7 +132,7 @@ class Asteroid:
     
     # Border checks for reseting position once reached edge of screen
     def check(self):
-        if self.x > WIDTH+15:
+        if self.x > WIDTH+15: # +15 for getting the move smoother, otherwise it is obvious that the asteroid has moved
             self.x = self.sx
             self.y = self.sy
         if self.x < -15:
@@ -154,7 +159,7 @@ class Asteroid:
         self.y = self.sy
 
 
-class Asteroid2:
+class small_asteroid:
     def __init__(self,x, y, level):
         self.x = x
         self.y = y
@@ -162,7 +167,7 @@ class Asteroid2:
         self.w = ASTEROID.get_width()
         self.h = ASTEROID.get_height()
         self.rect = ASTEROID.get_rect()
-        self.vel = level+1
+        self.vel = level + 1 # so that smaller asteroids are always faster than the bigger asteroids
         
         self.ast_img = SMALL_ASTEROID
         self.mask = p.mask.from_surface(self.ast_img)
@@ -195,14 +200,18 @@ class Asteroid2:
     def colide(self, obj):
         return collsion(self, obj)
     
-    # This places the asteroids onto the edge of the screen when reset
+    # This places the asteroids into a different position when the player loses a life
     def reset(self):
-        self.x = randint(0, WIDTH)
-        self.y = randint(0, HEIGHT)
+        self.x = randint(0, WIDTH-self.w)
+        if self.x <= (WIDTH // 2) + 100 and self.x > (WIDTH // 2) - 100:
+            self.x -= 100
+        self.y = randint(0, HEIGHT-self.h)
+        if self.y <= (HEIGHT // 2) + 100 and self.y > (HEIGHT // 2) - 100:
+            self.y -= 100
 
 
-class Laser(object):
-    def __init__(self, head, cosine, sine, lasers):
+class Laser:
+    def __init__(self, head, cosine, sine):
         self.laser_img = LASER
         self.point = head
         self.x, self.y = self.point
@@ -370,7 +379,7 @@ def main():
     def redraw_display():
         DIS.blit(BG, (0, 0))
         
-        # text
+        # text generation
         lives_label = m_font.render(f"Lives: {lives+1}", 1, WHITE)
         level_label = m_font.render(f"Level: {level}", 1, WHITE)
         hyper_label = m_font.render(f"Hyperspace cooldown: {round(hyper_cooldown/60)}", 1, WHITE)
@@ -435,9 +444,10 @@ def main():
                 p.quit()
                 exit()
             if event.type == p.KEYDOWN and event.key == p.K_c and len(player_lasers) <= 5: # cannot hold down laser button to fire a huge amount
-                player_lasers.append(Laser(player.head, player.cosine, player.sine, player_lasers))
+                player_lasers.append(Laser(player.head, player.cosine, player.sine))
         
-        keys = p.key.get_pressed() # This returns a dictionary containing all keys pressed
+        # Key Inputs
+        keys = p.key.get_pressed() 
         if keys[p.K_a]: # rotate left
             player.turn_left()
         if keys[p.K_d]: # rotate right
@@ -468,8 +478,8 @@ def main():
                     player_lasers.remove(i)
                 if i.y < 0:
                     player_lasers.remove(i)
-            except(ValueError):
-                print(f"{ValueError} in laser move loop.")
+            except ValueError as e:
+                print(f"{e} in laser move loop.")
                 continue
 
         # check player positions
@@ -480,12 +490,12 @@ def main():
             for j in asts[:]:
                 if i.colide(j):
                     for k in range(2):
-                        small_asts.append([k, Asteroid2(j.x, j.y, level)])
+                        small_asts.append([k, small_asteroid(j.x, j.y, level)])
                     asts.remove(j)
                     try:
                         player_lasers.remove(i)
-                    except(ValueError):
-                        print(f"{ValueError} in laser-asteroid colision")
+                    except ValueError as e:
+                        print(f"{e} in laser-asteroid colision")
                         continue
         
         for i in player_lasers[:]:
@@ -494,8 +504,8 @@ def main():
                     small_asts.remove(j)
                     try:
                         player_lasers.remove(i)
-                    except(ValueError):
-                        print(f"{ValueError} in laser-small asteroid loop")
+                    except ValueError as e:
+                        print(f"{e} in laser-small asteroid loop")
                         continue
         
         # checks for asteroid colisions with the player
@@ -526,10 +536,13 @@ def main():
                     player.x = WIDTH/2
                     player.y = WIDTH/2
                     player.move_forward()
+                    
                     for h in asts:
                         h.reset()
+                        
                     for i in small_asts:
                         i[1].reset()
+                        
                     player_lasers.clear()
                     lives = lives - 1
                     life_lost = FPS*2
